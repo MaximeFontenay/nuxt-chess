@@ -1,0 +1,273 @@
+//! ///////////////
+//! // Variables // 
+//! ///////////////
+
+//? Colors 
+$t: transparent;
+$light: #E6E6E6;
+$dark: #1d1d1d;
+
+$blue: #3377FE;
+$red: #DB785E;
+$green: #5DBE74;
+$yellow: #E3D45A;
+$purple: #A798E8;
+$black: #0B0905;
+$grey: #818181;
+$white: #F3F5F9;
+
+$primary: $black;
+$secondary: $yellow;
+
+
+$primary: #F4F83C;
+$primary30: #919405;
+$primary10: #303102;
+$light: #F3F3F3;
+$lightGrey: #A4A4A4;
+$darkGrey: #111111;
+$dark: #000000;
+
+//? Sizes
+$s1 : '1rem';
+$s2 : '2rem';
+$s3 : '3rem';
+$s4 : '4rem';
+$s5 : '5rem';
+$s6 : '6rem';
+$s7 : '7rem';
+$s8 : '8rem';
+$s9 : '9rem';
+$s10 : '10rem';
+
+//! ///////////
+//! // Fonts // 
+//! ///////////
+
+//? Main Fonts
+// .ttf format('TrueType') | .otf format('OpenType') | .woff format('woff') | .woff2 format('woff2')
+$font: 'satoshi';
+$fontFormat: 'woff2';
+
+@if $font != 'FontName' {
+    @font-face {
+        font-family: $font;
+        src: url("/fonts/#{$font}.#{$fontFormat}") format("#{$fontFormat}");
+        font-weight: 100 900;
+        font-variation-settings: 'wght' 400;
+        font-style: normal;
+        font-display: swap;
+    }
+} 
+
+//! ////////////
+//! // Mixins // 
+//! ////////////
+
+@mixin word-variation() {
+    @for $i from 1 through 36 {
+        :nth-child(#{$i}) {
+            font-weight: calc(25 * #{$i});
+        }
+    }
+}
+
+
+//? Variables 
+@mixin color($property: color, $color: $primary, $alpha: 1){
+    #{$property}: rgba($color, $alpha)
+}
+
+@mixin fz($i) {
+    @if $i >= 1 and $i < 2 {
+        font-size: clamp(calc(#{$i} * 13px), calc(#{$i} * .5vw), calc(#{$i} * 50px))
+    }
+    @if $i >= 2 and $i < 3 {
+        font-size: clamp(calc(#{$i} * 8px), calc(#{$i} * .6vw), calc(#{$i} * 30px))
+    }
+    @if $i >= 3 and $i < 4 {
+        font-size: clamp(calc(#{$i} * 6px), calc(#{$i} * .7vw), calc(#{$i} * 25px))
+    }
+    @if $i >= 4 {
+        font-size: clamp(calc(#{$i} * 7px), calc(#{$i} * .8vw), calc(#{$i} * 22px))
+    }
+}
+
+@mixin font($whichFont: $font) {
+    @if $whichFont != 'FontName' {
+        font-family: $whichFont, sans-serif;
+    }
+    @else {
+        font-family: sans-serif;
+    }
+    @include is-chrome {
+        -webkit-font-smoothing: subpixel-antialiased;
+    }
+    @include is-firefox {
+        -moz-osx-font-smoothing: grayscale;
+    }
+}
+
+//? Positioning
+@mixin flex($justify: center, $align: center,$direction: row, $wrap: nowrap, $gap: 0) {
+    display: flex;
+    flex-direction: $direction;
+    justify-content: $justify;
+    align-items: $align;
+    flex-wrap: $wrap;
+    gap: $gap;
+}
+
+@mixin position($top: initial, $left: initial, $bottom: initial, $right: initial, $position: absolute) {
+    content: '';
+    position: $position;
+    top: $top;
+    right: $right;
+    bottom: $bottom;
+    left: $left;
+}
+
+@mixin reset-position($top: initial, $right: initial, $bottom: initial, $left: initial, $position: initial, $transform: none){
+    position: $position;
+    top: $top;
+    right: $right;
+    bottom: $bottom;
+    left: $left;
+    transform: $transform;
+}
+
+@mixin text-stroke($size, $color, $spacing:false){
+    -webkit-text-stroke: $size $color;
+    color: $t;
+    @if $spacing{
+        letter-spacing: calc(#{$size} / 10)
+    }
+}
+
+@mixin glassMorphism($start: rgba( 227, 212, 90, 0.1), $end: rgba(29, 29, 29, .1) ) {
+    background-image: radial-gradient( circle farthest-corner at 92.3% 71.5%, $end 15%, $start 100%);
+    backdrop-filter: blur( 14px );
+    -webkit-backdrop-filter: blur( 14px );
+}
+
+@mixin hz-auto {
+    margin: { 
+        left: auto;
+        right: auto;
+    }
+}
+
+//? Shortcut
+@mixin background($size: contain, $position: center, $repeat: no-repeat) {
+    background-size: $size;
+    background-position: $position;
+    background-repeat: $repeat;
+}
+
+@mixin fixed-size($width, $height: $width, $fit: cover) {
+    width: $width;
+    min-width: $width;
+    max-width: $width;
+    height: $height;
+    min-height: $height;
+    max-height: $height;
+    object-fit: $fit;
+}
+
+@mixin observer($animation, $animation-start-value, $animation-end-value, $transition: .5s, $delay: 0s, ) {
+    transition: $animation $transition $delay;
+    #{$animation}: $animation-start-value;
+    &.in-view {
+        #{$animation}: $animation-end-value;
+    }
+}
+
+@mixin scrollbar($width: 1.5px, $color: $primary, $track: $t) {
+    scrollbar-width: thin;
+    scrollbar-color: $color $t;
+
+    &::-webkit-scrollbar {
+        height: $width;
+        width: $width;
+        border-radius: 5px;
+        transition: .2s;
+    }
+    &::-webkit-scrollbar-track {
+        background: $track;
+    }
+    &::-webkit-scrollbar-thumb {
+        background: $color;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    &::-webkit-scrollbar-thumb:hover {
+        @include color('background', $color, .5);
+    }
+}
+
+@mixin is-chrome {
+    @supports (-webkit-font-smoothing: subpixel-antialiased) {
+        @content;
+    }
+}
+
+@mixin is-firefox {
+    @-moz-document url-prefix() {
+        @content;
+    }
+}
+
+//? Responsive
+@mixin mobile($minmax: min-width) {
+    @media screen and ($minmax: 479.99px) {
+        @content;
+    }
+}
+
+@mixin tablet($minmax: min-width) {
+    @media screen and ($minmax: 767.99px) {
+        @content;
+    }
+}
+
+@mixin small-desktop($minmax: min-width) {
+    @media screen and ($minmax: 991.99px) {
+        @content;
+    }
+}
+
+@mixin desktop($minmax: min-width) {
+    @media screen and ($minmax: 1099.99px) {
+        @content;
+    }
+}
+
+@mixin large-desktop($minmax: min-width) {
+    @media screen and ($minmax: 1100px) {
+        @content;
+    }
+}
+
+//? Mobile first
+@mixin mq($bp) {
+    @if $bp == xl {
+        @media only screen and (min-width: 1221px) {
+           @content;
+        }
+    } 
+    @if $bp == lg {
+        @media only screen and (min-width: 1025px) {
+            @content;
+        }
+    } 
+    @else if $bp == md {
+        @media only screen and (min-width: 769px) {
+            @content;
+        }
+    } 
+    @else if $bp == sm {
+        @media only screen and (min-width: 481px) {
+            @content;
+        }
+    }
+}
