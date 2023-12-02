@@ -1,2 +1,2 @@
-# nuxt-chess
-The world first chess game using Nuxt3 
+# Nuxt Chess
+The world first chess game using Nuxt 3.
