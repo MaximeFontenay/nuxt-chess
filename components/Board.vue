@@ -1,7 +1,6 @@
 <script lang="ts" setup>
-import { useBoardStore } from '@/stores/chessBoard'
-const store = useBoardStore()
-
+const boardStore = useBoardStore()
+const currentPieceStore = useCurrentPieceStore()
 const appConfig = useAppConfig()
 const tileSize = ref(0)
 const board = ref<HTMLInputElement | null>(null);
@@ -36,18 +35,9 @@ const getColor = (piece:string):string => {
 	return 'black'
 } 
 
-const piece = ref(null)
-const { x, y, top, right, bottom, left, width, height } = useElementBounding(piece)
-
-
-const currentPosition = ref({x: 0, y: 0})
-
 const handleCurrentPosition = (position:{x:number, y:number}) => {
-	position = {
-		x: position.x - 1,
-		y: getYPosition(position.y) - 1
-	}
-	currentPosition.value = position
+	currentPieceStore.currentPiece.x = position.x
+	currentPieceStore.currentPiece.y = position.y
 }
 
 const handlePossibleMoves = (moves?:{x:number, y:number}[]) => {
@@ -67,14 +57,13 @@ const handlePossibleMoves = (moves?:{x:number, y:number}[]) => {
 }
 
 const movePiece = (e:any, x:number, y:number) => {
-	//console.log(e.target);
+	console.log(currentPieceStore.currentPiece);
 	if(e.target.classList.contains('possible-move')) {
-		const posY = currentPosition.value.y
-		const posX = currentPosition.value.x
-		const piece = store.board[posY][posX]
+		const pos = getBoardFromCoords(currentPieceStore.currentPiece.x, currentPieceStore.currentPiece.y)
+		const piece = boardStore.board[pos.y][pos.x]
 
-		store.board[posY][posX] = ' '
-		store.board[y - 1][x - 1] = piece
+		boardStore.board[pos.y][pos.x] = ' '
+		boardStore.board[y - 1][x - 1] = piece
 
 		handlePossibleMoves()
 	}
@@ -92,7 +81,7 @@ const movePiece = (e:any, x:number, y:number) => {
 	>
 		<!-- slot /-->
 		<div 
-			v-for="(row, rowIndex) in store.board"
+			v-for="(row, rowIndex) in boardStore.board"
 			:key="rowIndex"
 			class="board__row"
 			:class="`row-${rowIndex + 1}`"
@@ -174,6 +163,7 @@ const movePiece = (e:any, x:number, y:number) => {
 	max-height: 80vh;
 	margin: 50px auto;
 	aspect-ratio: 1;
+	user-select: none;
 
 	&__row {
 		@include flex(center, center);
@@ -239,9 +229,10 @@ const movePiece = (e:any, x:number, y:number) => {
 				width: 25%;
 				height: auto;
 				aspect-ratio: 1;
-				pointer-events: none;
-				border: 3px solid transparent;
+				border: calc(.5vw + .5vh) transparent double;
 				background-color: transparent;
+				opacity: .75;
+				pointer-events: none;
 			}
 
 			&.possible-move {

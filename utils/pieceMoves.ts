@@ -1,31 +1,36 @@
-
 export function generatePossibleMovesForPawn(x:number, y:number, color:string = 'white') {
     const possibleMoves = [];
     
-    // Vérifier les mouvements vers l'avant
-    if (color === 'white') {
-        possibleMoves.push({ x, y: y + 1 });
-
-        if (y === 2) {
+    if(color === 'white') {
+        if(y === 2) {
             possibleMoves.push({ x, y: y + 2 });
         }
+        if(y < 8) {
+            possibleMoves.push({ x, y: y + 1 });
+        }
+        if(x > 0) {
+            possibleMoves.push({ x: x - 1, y: y + 1 });
+        }
+        if(x < 8) {
+            possibleMoves.push({ x: x + 1, y: y + 1 });
+        }
     }
     else {
-        possibleMoves.push({ x, y: y - 1 });
-
-        if (y === 7) {
+        if(y === 7) {
             possibleMoves.push({ x, y: y - 2 });
+        }
+        if(y > 1) {
+            possibleMoves.push({ x, y: y - 1 });
+        }
+        if(x > 0) {
+            possibleMoves.push({ x: x - 1, y: y - 1 });
+        }
+        if(x < 8) {
+            possibleMoves.push({ x: x + 1, y: y - 1 });
         }
     }
 
-    if (color === 'white') {
-        possibleMoves.push({ x: x + 1, y: y + 1 });
-        possibleMoves.push({ x: x - 1, y: y + 1 });
-    }
-    else {
-        possibleMoves.push({ x: x + 1, y: y - 1 });
-        possibleMoves.push({ x: x - 1, y: y - 1 });
-    }
+
 
     return possibleMoves;
 }
@@ -33,31 +38,31 @@ export function generatePossibleMovesForPawn(x:number, y:number, color:string = 
 export function generatePossibleMovesForKnight(x:number, y:number, color:string = 'white') {
     const possibleMoves = [];
     
-
-    if(x > 1 && y > 0) {
-        possibleMoves.push({ x: x - 2, y: y - 1 });
-    }
-    if(x > 1 && y < 7) {
-        possibleMoves.push({ x: x - 2, y: y + 1 });
-    }
-    if(x > 0 && y > 1) {
+    if(x > 1 && y > 2) {
         possibleMoves.push({ x: x - 1, y: y - 2 });
     }
-    if(x > 0 && y < 6) {
-        possibleMoves.push({ x: x - 1, y: y + 2 });
+    if(x > 2 && y > 1) {
+        possibleMoves.push({ x: x - 2, y: y - 1 });
     }
-    if(x < 7 && y > 1) {
+    if(x < 8 && y > 2) {
         possibleMoves.push({ x: x + 1, y: y - 2 });
     }
-    if(x < 7 && y < 6) {
-        possibleMoves.push({ x: x + 1, y: y + 2 });
-    }
-    if(x < 6 && y > 0) {
+    if(x < 7 && y > 1) {
         possibleMoves.push({ x: x + 2, y: y - 1 });
     }
-    if(x < 6 && y < 7) {
+    if(x > 1 && y < 7) {
+        possibleMoves.push({ x: x - 1, y: y + 2 });
+    }
+    if(x > 2 && y < 8) {
+        possibleMoves.push({ x: x - 2, y: y + 1 });
+    }
+    if(x < 8 && y < 7) {
+        possibleMoves.push({ x: x + 1, y: y + 2 });
+    }
+    if(x < 7 && y < 8) {
         possibleMoves.push({ x: x + 2, y: y + 1 });
     }
+
 
     return possibleMoves;
 }
@@ -93,7 +98,6 @@ export function generatePossibleMovesForBishop(x:number, y:number, color:string 
         }
         possibleMoves.push({ x: x - i, y: y + i });
     }
-
 
     return possibleMoves;
 }

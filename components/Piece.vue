@@ -1,12 +1,12 @@
 <script lang="ts" setup>
+const boardStore = useBoardStore()
+const currentPieceStore = useCurrentPieceStore()
+const appConfig = useAppConfig()
+
 const emit = defineEmits<{
   possibleMoves: [{ x: number, y: number }[]],
   currentPosition: { x: number, y: number }[],
 }>()
-const appConfig = useAppConfig()
-const primary = appConfig.theme.colors.primary
-const black = appConfig.theme.colors.black
-const white = appConfig.theme.colors.white
 
 const props = defineProps({
     name: {
@@ -68,7 +68,7 @@ const piece = ref<HTMLElement | null>(null)
 
 const getMoves = (piece:string, x:number, y:number, color:string) => {
     emit('currentPosition', {x, y})
-
+    // link values with store
     let possibleMoves:{x:number, y:number}[] = []
 
     switch (piece) {
@@ -90,8 +90,27 @@ const getMoves = (piece:string, x:number, y:number, color:string) => {
         case 'k':
             possibleMoves = generatePossibleMovesForKing(x, y, color)
             break
-        
     }
+
+    // compare possible moves with current board state from store
+    // if there is a piece on the possible move, remove it from the possible moves (only if it's not the same color)
+    // if there is a piece on the possible move, stop checking the rest of the possible moves in that direction
+    // if there is a piece on the possible move, check if it's the same color, if it is, stop checking the rest of the possible moves in that direction
+    // if there is a piece on the possible move, check if it's the opposite color, if it is, stop checking the rest of the possible moves in that direction
+
+    possibleMoves.forEach(move => {
+        const tile = boardStore.board[move.y][move.x]
+        if(tile.trim().length > 0) {
+            console.log('there is : "' + tile + '" at x: ' +  move.x + ' y: ' + move.y);
+            const isBlack = tile.trim().toUpperCase() === tile.trim()
+
+            console.log("black : " + isBlack);
+        }
+    })
+
+    currentPieceStore.currentPiece.possibleMoves.value = possibleMoves
+
+
     console.log(possibleMoves);
     emit('possibleMoves', possibleMoves)
 }
