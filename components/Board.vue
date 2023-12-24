@@ -1,11 +1,15 @@
+import { Board } from '../.nuxt/components';
 <script lang="ts" setup>
 const boardStore = useBoardStore()
 const currentPieceStore = useCurrentPieceStore()
 const appConfig = useAppConfig()
-const tileSize = ref(0)
+const tileSize = ref(10)
 const board = ref<HTMLInputElement | null>(null);
 const letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
 const reversedNumbers = Array.from({ length: 8 }, (_, i) => 8 - i);
+const darkTileColor = computed(() => appConfig.theme.colors.darkTile)
+const lightTileColor = computed(() => appConfig.theme.colors.lightTile)
+
 
 const handleResize = () => {
 	if(board.value?.offsetWidth) {
@@ -27,7 +31,6 @@ const getYPosition = (num:number) => {
 	return Math.abs(Math.abs(num) - 8) + 1
 }
 
-
 const getColor = (piece:string):string => {
 	if (piece.toLocaleLowerCase() === piece) {
 		return 'white'
@@ -35,9 +38,11 @@ const getColor = (piece:string):string => {
 	return 'black'
 } 
 
-const handleCurrentPosition = (position:{x:number, y:number}) => {
-	currentPieceStore.currentPiece.x = position.x
-	currentPieceStore.currentPiece.y = position.y
+const handleCurrentPosition = (pieceData:{x:number, y:number, piece: string, color: string}) => {
+	currentPieceStore.currentPiece.x = pieceData.x
+	currentPieceStore.currentPiece.y = pieceData.y
+	currentPieceStore.currentPiece.piece = pieceData.piece
+	currentPieceStore.currentPiece.color = pieceData.color
 }
 
 const handlePossibleMoves = (moves?:{x:number, y:number}[]) => {
@@ -57,17 +62,29 @@ const handlePossibleMoves = (moves?:{x:number, y:number}[]) => {
 }
 
 const movePiece = (e:any, x:number, y:number) => {
+	console.log('---------------' );
+	console.log('---------------' );
+	console.log('---------------' );
+	console.log('current piece: ' );
 	console.log(currentPieceStore.currentPiece);
+	console.log('---------------' );
+	console.log('---------------' );
+
 	if(e.target.classList.contains('possible-move')) {
 		const pos = getBoardFromCoords(currentPieceStore.currentPiece.x, currentPieceStore.currentPiece.y)
 		const piece = boardStore.board[pos.y][pos.x]
 
+		console.log(pos);
+
+		// remove piece from old position based on currentPieceStore.currentPiece
 		boardStore.board[pos.y][pos.x] = ' '
+		// add piece to new position based on pos
 		boardStore.board[y - 1][x - 1] = piece
 
 		handlePossibleMoves()
 	}
 }
+
 
 </script>
 
@@ -158,7 +175,6 @@ const movePiece = (e:any, x:number, y:number) => {
 	@include flex(flex-start, flex-start, column);
 	position: relative;
 	width: 100%;
-	height: 100%;
 	max-width: 80vw;
 	max-height: 80vh;
 	margin: 50px auto;
@@ -172,20 +188,22 @@ const movePiece = (e:any, x:number, y:number) => {
 			flex-direction: row;
 			.tile {
 				&:nth-of-type(odd) {
-					background-color: var(--tile-light);
+					background-color: v-bind(lightTileColor);
 				}
 				&:nth-of-type(even) {
-					background-color: var(--tile-dark);
+					background-color: v-bind(darkTileColor);
+					box-shadow: 0px 0px 20px 30px rgba(175, 175, 175, 0.1) inset;
 				}
 			}
 		}
 		&:nth-child(even) {
 			.tile {
 				&:nth-of-type(even) {
-					background-color: var(--tile-light);
+					background-color: v-bind(lightTileColor);
 				}
 				&:nth-of-type(odd) {
-					background-color: var(--tile-dark);
+					background-color: v-bind(darkTileColor);
+					box-shadow: 0px 0px 20px 30px rgba(175, 175, 175, 0.1) inset;
 				}
 			}
 			.marker {
@@ -201,6 +219,7 @@ const movePiece = (e:any, x:number, y:number) => {
 			color: $black;
 			font-size: 1.2vw;
 			position: relative;
+			backdrop-filter: blur(20px);
 			will-change: width, height;
 			transition: .25s ease-in-out;
 
@@ -249,8 +268,6 @@ const movePiece = (e:any, x:number, y:number) => {
 			}
 		}
 	}
-
-
 	.marker {
 		@include flex();
 		font-size: 3vw;

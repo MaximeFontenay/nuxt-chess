@@ -1,3 +1,4 @@
+import { Piece } from '../.nuxt/components';
 <script lang="ts" setup>
 const boardStore = useBoardStore()
 const currentPieceStore = useCurrentPieceStore()
@@ -5,7 +6,7 @@ const appConfig = useAppConfig()
 
 const emit = defineEmits<{
   possibleMoves: [{ x: number, y: number }[]],
-  currentPosition: { x: number, y: number }[],
+  currentPosition: { x: number, y: number, piece: string, color: string }[],
 }>()
 
 const props = defineProps({
@@ -67,7 +68,7 @@ const piece = ref<HTMLElement | null>(null)
 // }
 
 const getMoves = (piece:string, x:number, y:number, color:string) => {
-    emit('currentPosition', {x, y})
+    emit('currentPosition', {piece, x, y, color})
     // link values with store
     let possibleMoves:{x:number, y:number}[] = []
 
@@ -98,21 +99,46 @@ const getMoves = (piece:string, x:number, y:number, color:string) => {
     // if there is a piece on the possible move, check if it's the same color, if it is, stop checking the rest of the possible moves in that direction
     // if there is a piece on the possible move, check if it's the opposite color, if it is, stop checking the rest of the possible moves in that direction
 
-    possibleMoves.forEach(move => {
-        const tile = boardStore.board[move.y][move.x]
-        if(tile.trim().length > 0) {
-            console.log('there is : "' + tile + '" at x: ' +  move.x + ' y: ' + move.y);
-            const isBlack = tile.trim().toUpperCase() === tile.trim()
 
-            console.log("black : " + isBlack);
+    //TODO Issue here 
+
+    let filteredPossibleMoves:{x:number, y:number}[] = []
+
+    possibleMoves.forEach(move => {
+		const pos = getBoardFromCoords(move.x, move.y)
+        const tile = boardStore.board[pos.y][pos.x]
+
+        if(tile?.trim()?.length > 0) {
+            const pieceOnTile = tile
+            let pieceOnTileColor
+
+            // A terme il faut déplacer cette logique directement dans l'utils : pieceMoves.ts
+            if (pieceOnTile.toLocaleLowerCase() === pieceOnTile) {
+                pieceOnTileColor = 'white'
+            } else {
+                pieceOnTileColor = 'black'
+            }
+
+            if (color === pieceOnTileColor) {
+                
+                // la modification semble altérer la boucle du tableau possibleMoves
+                filteredPossibleMoves = possibleMoves.filter(possibleMove => {
+                    return possibleMove.x !== move.x && possibleMove.y !== move.y
+                })
+            }
+
+            console.log('there is : "' + pieceOnTile + '" ; color: ' + pieceOnTileColor + ' ; at x: ' +  move.x + ' y: ' + move.y);
+            console.log('-----');  
         }
     })
+    console.log(filteredPossibleMoves);
 
-    currentPieceStore.currentPiece.possibleMoves.value = possibleMoves
+   
+    currentPieceStore.currentPiece.possibleMoves.value = filteredPossibleMoves
 
 
-    console.log(possibleMoves);
-    emit('possibleMoves', possibleMoves)
+    //console.log(possibleMoves);
+    emit('possibleMoves', filteredPossibleMoves)
 }
 
 

@@ -27,7 +27,6 @@
 }
 
 html {
-    font-size: 62.5%;
     overflow-x: hidden;
     scroll-behavior: smooth;
 }
@@ -80,14 +79,10 @@ svg {
     @include is-firefox {
         image-rendering: optimizequality;
     }
-
-    path {
-        transition: .2s;
-    }
 }
 
 a {
-    transition: .3s;
+    text-decoration: none;
 
     &::selection,
     &:hover {
@@ -141,4 +136,15 @@ button {
 }
 :where(img, svg, video, canvas, audio, iframe, embed, object) {
     display: block;
+}
+
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }

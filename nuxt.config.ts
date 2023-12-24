@@ -36,5 +36,7 @@ export default defineNuxtConfig({
     modules: [
         '@vueuse/nuxt',
         '@pinia/nuxt',
+        'nuxt-icon', // https://icones.js.org/
+
     ],
 })
