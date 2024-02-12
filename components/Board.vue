@@ -1,126 +1,292 @@
-<template>
-	<div class="board">
+import { Board } from '../.nuxt/components';
+<script lang="ts" setup>
+const boardStore = useBoardStore()
+const currentPieceStore = useCurrentPieceStore()
+const appConfig = useAppConfig()
+const tileSize = ref(10)
+const board = ref<HTMLInputElement | null>(null);
+const letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
+const reversedNumbers = Array.from({ length: 8 }, (_, i) => 8 - i);
+const darkTileColor = computed(() => appConfig.theme.colors.darkTile)
+const lightTileColor = computed(() => appConfig.theme.colors.lightTile)
 
-		<div class="board__row">
-			<div class="tile 1"></div>
-			<div class="tile 2"></div>
-			<div class="tile 3"></div>
-			<div class="tile 4"></div>
-			<div class="tile 5"></div>
-			<div class="tile 6"></div>
-			<div class="tile 7"></div>
-			<div class="tile 8"></div>
+
+const handleResize = () => {
+	if(board.value?.offsetWidth) {
+		if(window.innerWidth > window.innerHeight) {
+			tileSize.value = board.value.offsetHeight / 8;
+		}
+		else {
+			tileSize.value = board.value.offsetWidth / 8;
+		}
+	}
+}
+
+onMounted(() => {
+	handleResize()
+	window.addEventListener('resize', handleResize);
+});
+
+const getYPosition = (num:number) => {
+	return Math.abs(Math.abs(num) - 8) + 1
+}
+
+const getColor = (piece:string):string => {
+	if (piece.toLocaleLowerCase() === piece) {
+		return 'white'
+	}
+	return 'black'
+} 
+
+const handleCurrentPosition = (pieceData:{x:number, y:number, piece: string, color: string}) => {
+	currentPieceStore.currentPiece.x = pieceData.x
+	currentPieceStore.currentPiece.y = pieceData.y
+	currentPieceStore.currentPiece.piece = pieceData.piece
+	currentPieceStore.currentPiece.color = pieceData.color
+}
+
+const handlePossibleMoves = (moves?:{x:number, y:number}[]) => {
+	const previousPossibleMoves = document.querySelectorAll('.possible-move')
+	previousPossibleMoves.forEach(move => {
+		move.classList.remove('possible-move')
+	})
+
+	if(!moves) return
+
+	moves.forEach(move => {
+		const tile = document.querySelector(`.row-${getYPosition(move.y)} .tile-${move.x}`)
+		if(tile) {
+			tile.classList.add('possible-move')
+		}
+	})
+}
+
+const movePiece = (e:any, x:number, y:number) => {
+	console.log('---------------' );
+	console.log('---------------' );
+	console.log('---------------' );
+	console.log('current piece: ' );
+	console.log(currentPieceStore.currentPiece);
+	console.log('---------------' );
+	console.log('---------------' );
+
+	if(e.target.classList.contains('possible-move')) {
+		const pos = getBoardFromCoords(currentPieceStore.currentPiece.x, currentPieceStore.currentPiece.y)
+		const piece = boardStore.board[pos.y][pos.x]
+
+		console.log(pos);
+
+		// remove piece from old position based on currentPieceStore.currentPiece
+		boardStore.board[pos.y][pos.x] = ' '
+		// add piece to new position based on pos
+		boardStore.board[y - 1][x - 1] = piece
+
+		handlePossibleMoves()
+	}
+}
+
+
+</script>
+
+<template>
+	<div 
+		ref="board"
+		class="board" 
+		:style="{
+			margin: `${tileSize}px`
+		}"
+	>
+		<!-- slot /-->
+		<div 
+			v-for="(row, rowIndex) in boardStore.board"
+			:key="rowIndex"
+			class="board__row"
+			:class="`row-${rowIndex + 1}`"
+		>
+			<div 
+				ref="tile"
+				v-for="(tile, tileIndex) in row"
+				:key="tileIndex"
+				class="tile"
+				:class="`tile-${tileIndex + 1}`"
+				:style="{
+					width: `${tileSize}px`,
+				 	height: `${tileSize}px`
+				}"
+				@click="movePiece($event, tileIndex + 1, rowIndex + 1)"
+			>
+				<Piece
+					v-if="tile.trim().length > 0"
+                    :name="tile.toLocaleLowerCase().trim()"
+                    :color="getColor(tile)"
+					:size="tileSize"
+					:position="{
+                        x: tileIndex + 1,
+                        y: getYPosition(rowIndex + 1),
+                    }"
+					@currentPosition="handleCurrentPosition($event)"
+					@possibleMoves="handlePossibleMoves($event)"
+                />
+			</div>
 		</div>
-		<div class="board__row">
-			<div class="tile 9"></div>
-			<div class="tile 10"></div>
-			<div class="tile 11"></div>
-			<div class="tile 12"></div>
-			<div class="tile 13"></div>
-			<div class="tile 14"></div>
-			<div class="tile 15"></div>
-			<div class="tile 16"></div>
+
+		<div class="marker-col" :style="{width: `${tileSize}px`}">
+			<div 
+				class="marker"
+				v-for="number in reversedNumbers" 
+				:key="number"
+				:style="{
+					width: `${tileSize}px`,
+					height: `${tileSize}px`,
+					minWidth: `${tileSize}px`,
+				 	minHeight: `${tileSize}px`,
+				}"
+			>
+				{{ number }}	
+			</div>
 		</div>
-		<div class="board__row">
-			<div class="tile 17"></div>
-			<div class="tile 18"></div>
-			<div class="tile 19"></div>
-			<div class="tile 20"></div>
-			<div class="tile 21"></div>
-			<div class="tile 22"></div>
-			<div class="tile 23"></div>
-			<div class="tile 24"></div>
-		</div>
-		<div class="board__row">
-			<div class="tile 25"></div>
-			<div class="tile 26"></div>
-			<div class="tile 27"></div>
-			<div class="tile 28"></div>
-			<div class="tile 29"></div>
-			<div class="tile 30"></div>
-			<div class="tile 31"></div>
-			<div class="tile 32"></div>
-		</div>
-		<div class="board__row">
-			<div class="tile 33"></div>
-			<div class="tile 34"></div>
-			<div class="tile 35"></div>
-			<div class="tile 36"></div>
-			<div class="tile 37"></div>
-			<div class="tile 38"></div>
-			<div class="tile 39"></div>
-			<div class="tile 40"></div>
-		</div>
-		<div class="board__row">
-			<div class="tile 41"></div>
-			<div class="tile 42"></div>
-			<div class="tile 43"></div>
-			<div class="tile 44"></div>
-			<div class="tile 45"></div>
-			<div class="tile 46"></div>
-			<div class="tile 47"></div>
-			<div class="tile 48"></div>
-		</div>
-		<div class="board__row">
-			<div class="tile 49"></div>
-			<div class="tile 50"></div>
-			<div class="tile 51"></div>
-			<div class="tile 52"></div>
-			<div class="tile 53"></div>
-			<div class="tile 54"></div>
-			<div class="tile 55"></div>
-			<div class="tile 56"></div>
-		</div>
-		<div class="board__row">
-			<div class="tile 57"></div>
-			<div class="tile 58"></div>
-			<div class="tile 59"></div>
-			<div class="tile 60"></div>
-			<div class="tile 61"></div>
-			<div class="tile 62"></div>
-			<div class="tile 63"></div>
-			<div class="tile 64"></div>
+		<div class="marker-row" :style="{height: `${tileSize}px`}">
+			<div 
+				class="marker"
+				v-for="(letter, i) in letters" 
+				:key="letter"
+				:style="{
+					width: `${tileSize}px`,
+					height: `${tileSize}px`,
+					minWidth: `${tileSize}px`,
+				 	minHeight: `${tileSize}px`
+				}"
+			>
+				{{ letter }} {{ i + 1 }}
+			</div>
 		</div>
 	</div>
 </template>
 
-<script lang="ts" setup>
-const appConfig = useAppConfig()
-
-
-</script>
 
 <style lang="scss" scoped>
 @use 'assets/_variables.scss' as *;
 
 .board {
+	--tile-light: #{$lightTile};
+	--tile-dark: #{$darkTile};
+	--accentColor: #{$yellow};
+
 	@include flex(flex-start, flex-start, column);
-	width: 700px;
+	position: relative;
+	width: 100%;
+	max-width: 80vw;
+	max-height: 80vh;
 	margin: 50px auto;
 	aspect-ratio: 1;
+	user-select: none;
 
 	&__row {
 		@include flex(center, center);
 
 		&:nth-child(odd) {
 			flex-direction: row;
+			.tile {
+				&:nth-of-type(odd) {
+					background-color: v-bind(lightTileColor);
+				}
+				&:nth-of-type(even) {
+					background-color: v-bind(darkTileColor);
+					box-shadow: 0px 0px 20px 30px rgba(175, 175, 175, 0.1) inset;
+				}
+			}
 		}
 		&:nth-child(even) {
-			flex-direction: row-reverse;
+			.tile {
+				&:nth-of-type(even) {
+					background-color: v-bind(lightTileColor);
+				}
+				&:nth-of-type(odd) {
+					background-color: v-bind(darkTileColor);
+					box-shadow: 0px 0px 20px 30px rgba(175, 175, 175, 0.1) inset;
+				}
+			}
+			.marker {
+				order: 1
+			}
 		}
 
 		.tile {
+			@include flex();
 			aspect-ratio: 1;
+			width: 50px;
+			height: 50px;
+			color: $black;
+			font-size: 1.2vw;
+			position: relative;
+			backdrop-filter: blur(20px);
+			will-change: width, height;
+			transition: .25s ease-in-out;
 
-			&:nth-child(odd) {
-				background-color: $light;
+			&.possible-move:has(.piece):before, &.possible-move:has(.piece):after {
+				display: none;
 			}
-			&:nth-child(even) {
-				background-color: $red;
+
+			&::before {
+				content: '';
+				@include position(0,0);
+				z-index: 1;
+				width: 100%;
+				height: 100%;
+				pointer-events: none;
+				background-color: var(--accentColor);
+				opacity: 0;
+			}
+
+			&::after {
+				content: '';
+				@include position(0,0);
+				inset: 50%;
+				z-index: 2;
+				translate: -50% -50%;
+				border-radius: 50%;
+				width: 25%;
+				height: auto;
+				aspect-ratio: 1;
+				border: calc(.5vw + .5vh) transparent double;
+				background-color: transparent;
+				opacity: .75;
+				pointer-events: none;
+			}
+
+			&.possible-move {
+				cursor: pointer;
+
+				&:hover::before {
+					opacity: .2;
+					transition: .25s ease-in-out;
+				}
+				&::after {
+					border-color: var(--accentColor);
+					transition: .25s ease-in-out;
+				}
 			}
 		}
 	}
+	.marker {
+		@include flex();
+		font-size: 3vw;
+		overflow: hidden;
+		
+		&-col {
+			@include flex(center, center, column);
+			@include position(0,0);
+			translate: -100% 0;
+			height: 100%;
+		}
 
+		&-row {
+			@include flex(flex-start, center);
+			@include position($bottom:0,$left:0);
+			translate: 0 100%;
+			width: 100%;
+		}
+	}
 }
 
 </style>

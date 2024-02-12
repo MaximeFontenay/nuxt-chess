@@ -1,22 +1,15 @@
 <template>
-	<div>
+    <main>
 
-		<h1>test</h1>
+        <Navbar />
+        
+        <div class="board-wrapper">
+            <Board></Board>
+        </div>
+        <aside class="sidebar sidebar-right">
 
-        <Board></Board>
-
-        <Piece
-            name="pawn"
-            color="white"
-            :available-moves="['b2', 'c3']"
-        ></Piece>
-
-        <Piece
-            name="queen"
-            color="black"
-            :available-moves="['b2', 'c3']"
-        ></Piece>
-	</div>
+        </aside>
+    </main>
 </template>
 
 <script lang="ts" setup>
@@ -26,4 +19,20 @@
 <style lang="scss" scoped>
 @use '@/assets/_variables.scss' as *;
 
+main {
+    @include flex(space-between, center);
+    width: 100%;
+    height: 100vh;
+    background-image: url('/assets/img/bg-blury.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: top left;
+}
+
+
+.board-wrapper {
+    @include flex();
+    width: 100%;
+    height: 100%;   
+}
 </style>

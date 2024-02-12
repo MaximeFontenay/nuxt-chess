@@ -3,7 +3,7 @@
 *, ::after, ::before {
     margin: 0;
     padding: 0;
-    user-select: none;
+    // user-select: none;
     list-style: none;
     box-sizing: border-box;
     -webkit-tap-highlight-color: transparent;
@@ -27,7 +27,6 @@
 }
 
 html {
-    font-size: 62.5%;
     overflow-x: hidden;
     scroll-behavior: smooth;
 }
@@ -38,7 +37,7 @@ body {
     min-height: 100svh;
     position: relative;
     color: $light;
-    background-color: $dark;
+    background-color: #4b4b4b;
     margin: 0 !important;
     overflow-x: hidden;
     scroll-behavior: smooth;
@@ -54,10 +53,6 @@ body {
     }
 }
 
-div {
-    max-width: 100%;
-    width: 100%;
-}
 
 img {
     max-height: 100%;
@@ -84,14 +79,10 @@ svg {
     @include is-firefox {
         image-rendering: optimizequality;
     }
-
-    path {
-        transition: .2s;
-    }
 }
 
 a {
-    transition: .3s;
+    text-decoration: none;
 
     &::selection,
     &:hover {
@@ -145,4 +136,15 @@ button {
 }
 :where(img, svg, video, canvas, audio, iframe, embed, object) {
     display: block;
+}
+
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
