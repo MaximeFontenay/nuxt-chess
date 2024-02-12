@@ -9,12 +9,13 @@
     "postinstall": "nuxt prepare"
   },
   "devDependencies": {
-    "nuxt": "^3.3.2"
+    "@nuxt/devtools": "^1.0.8",
+    "nuxt": "^3.4.3",
+    "pinia": "^2.0.36",
+    "sass": "^1.62.1",
+    "vue": "^3.3.1"
   },
   "dependencies": {
-    "@nuxtjs/composition-api": "^0.33.1",
-    "pinia": "^2.0.33",
-    "sass": "^1.60.0",
-    "vue": "^3.2.47"
+    "@nuxtjs/composition-api": "^0.33.1"
   }
 }
