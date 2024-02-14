@@ -1,12 +1,9 @@
-export const useCurrentPieceStore = defineStore('currentPiece', () => {
+export const useCurrentPieceStore = defineStore("currentPiece", () => {
+  const x = ref<number>(0);
+  const y = ref<number>(0);
+  const piece = ref<string>(" ");
+  const color = ref<string>("");
+  const possibleMoves = ref<Array<{ x: number; y: number }>>([]);
 
-    const currentPiece = ref({
-        x: 0,
-        y: 0,
-        piece: ' ',
-        color: 'white',
-        possibleMoves: []
-    })
-
-    return { currentPiece }
-})
+  return { x, y, piece, color, possibleMoves };
+});
